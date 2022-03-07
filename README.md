@@ -6,12 +6,10 @@
 git clone https://github.com/JUNZHU-SEIS/TLPN.git
 cd TLPN
 ```
-* Create TLPN environment
+* Create TLPN environment (for Chinese users to download pytorch using conda, [the tuna mirror](https://mirror.tuna.tsinghua.edu.cn/help/anaconda/) is recommended)
 ```bash
-conda create -n TLPN
+conda env create -f env.yml
 conda activate TLPN
-conda install pip
-pip install seisbench
 ```
 ## 2. Pre-trained model
 Located in directory: **model/tlstead.pt**
