@@ -6,7 +6,7 @@
 git clone https://github.com/JUNZHU-SEIS/TLPN.git
 cd TLPN
 ```
-* Create TLPN environment (for Chinese users to download pytorch using conda, [the tuna mirror](https://mirror.tuna.tsinghua.edu.cn/help/anaconda/) is recommended)
+* Create TLPN environment (for Chinese users, [the anaconda mirror maintained by tuna](https://mirror.tuna.tsinghua.edu.cn/help/anaconda/) is recommended to download pytorch)
 ```bash
 conda env create -f env.yml
 conda activate TLPN
