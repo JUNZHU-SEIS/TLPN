@@ -37,6 +37,10 @@ def read_args():
 						default="../results",
 						type=str,
 						help="../results")
+	parser.add_argument("--num_workers",
+						default=20,
+						type=int,
+						help=8)
 	args = parser.parse_args()
 	return args
 
@@ -70,9 +74,9 @@ if __name__ == "__main__":
 	args = read_args()
 	# create the test dataloader
 	test_loader = DataLoader(Dataset(args.data_list, args.data_dir, mode='test'),
-			batch_size=batch_size, shuffle=False, num_workers=20)
+			batch_size=batch_size, shuffle=False, num_workers=args.num_workers)
 	# choose a model to do phase picking
-	model = torch.load(args.model)
+	model = torch.load(args.model, map_location=device)
 	# log the results
 	if not os.path.exists(args.result_dir):
 		os.makedirs(args.result_dir)

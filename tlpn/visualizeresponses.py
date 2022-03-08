@@ -33,6 +33,10 @@ def read_args():
 						default="../dataset/waveform_pred",
 						type=str,
 						help="../dataset/waveform_pred")
+	parser.add_argument("--num_workers",
+						default=20,
+						type=int,
+						help=8)
 	args = parser.parse_args()
 	return args
 
@@ -87,14 +91,17 @@ def plo(input, target, model_dict, p=-100, s=-100, error=10, title=""):
 if __name__ == "__main__":
 	args = read_args()
 	# instantiate 5 different models
-	retrain_model = torch.load(os.path.join(args.model_dir, 'retrain.pt')).to(device)
+	retrain_model = torch.load(os.path.join(args.model_dir, 'retrain.pt'),
+			map_location=device).to(device)
 	scedc_model = torch.load(os.path.join(args.model_dir, 'scedc.pt')).to(device)
-	tl_scedc_model = torch.load(os.path.join(args.model_dir, 'tlscedc.pt')).to(device)
+	tl_scedc_model = torch.load(os.path.join(args.model_dir, 'tlscedc.pt'),
+			map_location=device).to(device)
 	stead_model = torch.load(os.path.join(args.model_dir, 'stead.pt')).to(device)
-	tl_stead_model = torch.load(os.path.join(args.model_dir, 'tlstead.pt')).to(device)
+	tl_stead_model = torch.load(os.path.join(args.model_dir, 'tlstead.pt'),
+			map_location=device).to(device)
 	# create test dataloader
 	test_loader = DataLoader(Dataset(args.data_list, args.data_dir, mode='test'),
-			batch_size=batch_size, shuffle=False, num_workers=20)
+			batch_size=batch_size, shuffle=False, num_workers=args.num_workers)
 	# show example one by one
 	for i,sample in enumerate(test_loader):
 		input = Variable(sample['input'].type(dtype)).to(device)
