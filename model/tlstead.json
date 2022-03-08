@@ -1,0 +1,12 @@
+{
+    "docstring": "Model trained on Xichang Seismic Array pretrained by STEAD for 100 epochs with a learning rate decay schedule.\nThreshold selected for optimal F1 score on in-domain evaluation. Depending on the target region, the thresholds might need to be adjusted.\nWhen using this model, please reference the SeisBench publications listed at https://github.com/seisbench/seisbench\n\nJannes M\u00fcnchmeyer, Jack Woollam (munchmej@gfz-potsdam.de, jack.woollam@kit.edu)",
+    "model_args": {
+        "component_order": "ZNE",
+        "phases": "PSN"
+    },
+    "seisbench_requirement": "0.1.6",
+    "default_args": {
+        "P_threshold": 0.24371359808145301,
+        "S_threshold": 0.12588967477204907
+    }
+}
