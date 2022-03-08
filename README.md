@@ -6,9 +6,9 @@
 git clone https://github.com/JUNZHU-SEIS/TLPN.git
 cd TLPN
 ```
-* Create TLPN environment (for Chinese users, [the anaconda mirror maintained by tuna](https://mirror.tuna.tsinghua.edu.cn/help/anaconda/) is recommended to download pytorch)
+* Create TLPN environment (for Chinese users, [the anaconda mirror maintained by tuna](https://mirror.tuna.tsinghua.edu.cn/help/anaconda/) is recommended to download pytorch.)
 ```bash
-conda env create -f env.yml
+conda env create -f env.yml # It might take you a long time
 conda activate TLPN
 ```
 ## 2. Pre-trained model
