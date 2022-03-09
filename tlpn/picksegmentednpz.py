@@ -80,7 +80,7 @@ if __name__ == "__main__":
 	# log the results
 	if not os.path.exists(args.result_dir):
 		os.makedirs(args.result_dir)
-	file=os.path.join(args.result_dir, 'picks.csv')
+	file=os.path.join(args.result_dir, 'segmentedpicks.csv')
 	with open(file, 'w') as f:
 		f.write(','.join(('fname', 'itp', 'prob_p', 'its', 'prob_s', 'true_p',
 						'true_s'))+'\n')
