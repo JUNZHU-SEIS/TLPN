@@ -65,6 +65,7 @@ def plot(stream, response, folder='./'):
 #	ax[0].set_yticks([])
 	plt.savefig(os.path.join(folder, title+".png"), dpi=600)
 #	plt.show()
+	plt.close()
 	return
 
 if __name__ == "__main__":
