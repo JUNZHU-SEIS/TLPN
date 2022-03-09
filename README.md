@@ -15,3 +15,5 @@ conda activate TLPN
 Located in directory: **model/tlstead.pt**
 ## 3. Batch prediction
 See details in the notebook: [example_batch_prediction.ipynb](docs/example_batch_prediction.ipynb)
+## 4. Predict a continuous waveform
+See details in the notebook: [example_predict_continuous_waveform.ipynb](docs/example_predict_continuous_waveform.ipynb)

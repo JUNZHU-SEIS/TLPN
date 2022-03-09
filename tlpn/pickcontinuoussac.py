@@ -6,75 +6,85 @@
 
 import os
 import argparse
-from detect_peaks import detect_peaks
+import numpy as np
+import matplotlib.pyplot as plt
 import torch
-# device
-os.environ["CUDA_VISIBLE_DEVICES"] = '0'
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-# data type for torch
-dtype = torch.FloatTensor
-from torch.utils.data import DataLoader
-from torch.autograd import Variable
 from obspy import read
 import seisbench.models as sbm
 from config import *
-from dataset import Dataset
 
 
 def read_args():
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--model",
-						default="../model/retrain.pt",
+						default="../model/tlstead.pt",
 						type=str,
 						help="../model/[retrain, scedc, tlscedc, stead, tlstead]")
-	parser.add_argument("--data_list",
-						default="../dataset/waveform.csv",
+	parser.add_argument("--fname",
+						default="../dataset/sac/*",
 						type=str,
-						help="../dataset/waveform.csv")
-	parser.add_argument("--data_dir",
-						default="../dataset/waveform_pred",
-						type=str,
-						help="../dataset/waveform_pred")
+						help="../dataset/sac/*.sac")
 	parser.add_argument("--result_dir",
 						default="../results",
 						type=str,
 						help="../results")
-	parser.add_argument("--num_workers",
-						default=20,
-						type=int,
-						help=8)
 	args = parser.parse_args()
 	return args
 
+def routine(stream):
+	st = stream.copy()
+	st.detrend()
+#	st.taper(max_percentage=.05)
+#	st.filter('bandpass', freqmin=1, freqmax=15, zerophase='True')
+	st.normalize()
+	return st
+
+def plot(stream, response, folder='./'):
+	stream.normalize()
+	maxstart, minend = max([x.stats.starttime for x in stream]), min([x.stats.endtime for x in stream])
+	stream.trim(maxstart, minend)
+	st = np.vstack([tr.data for tr in stream]).transpose()
+	re= np.vstack([tr.data for tr in response])[:-1].transpose()
+	meta = stream[0].stats
+	title = "%s_%s_%s"%(meta['network'], meta['station'], meta['starttime'])
+	lw = .8
+	t = np.arange(st.shape[0]) / 100
+	fig = plt.figure()
+	ax = fig.subplots(2, 1, sharex=True, gridspec_kw={'hspace':.15})
+#	ax[0].plot(t, st[:,0], lw=lw, label=stream[0].stats.channel)
+#	ax[0].plot(t, st[:,1]-2, lw=lw, label=stream[1].stats.channel)
+#	ax[0].plot(t, st[:,2]-4, lw=lw, label=stream[2].stats.channel)
+	ax[0].plot(t, st, lw=lw, label=[trace.stats.channel for trace in stream])
+	ax[1].plot(t, re, lw=lw, label=['P', 'S'])
+	ax[0].legend(loc='best')
+	ax[1].legend(loc='best')
+	ax[0].set_title(title)
+	ax[1].set_xlabel('Time (s)')
+	ax[0].set_ylabel('Waveform')
+	ax[1].set_ylabel('Response')
+#	ax[0].set_yticks([])
+	plt.savefig(os.path.join(folder, title+".png"), dpi=600)
+#	plt.show()
+	return
+
 if __name__ == "__main__":
 	args = read_args()
-#	# create the test dataloader
-	test_loader = DataLoader(Dataset(args.data_list, args.data_dir, mode='test'),
-			batch_size=batch_size, shuffle=False, num_workers=args.num_workers)
 	# test waveform in sac format
-	sac = read('/home/as/Data/tlPhasenet/xichang/20151001.274.174337.050/*')
+	sac = read(args.fname)
+	sac = routine(sac)
 	# instantiate a seisbench model
 	model = sbm.PhaseNet(phases='PSN')
 	# choose a model to load
 	model.load_state_dict(torch.load(args.model).state_dict())
-	response = model.annotate(sac)
+	if not os.path.exists(os.path.join(args.result_dir, 'figures')):
+		os.makedirs(os.path.join(args.result_dir, 'figures'))
+	# pick P & S
 	picks = model.classify(sac, P_threshold=.41, S_threshold=.36)
-	sac.plot()
-	response.plot()
-#	# log the results
-#	if not os.path.exists(args.result_dir):
-#		os.makedirs(args.result_dir)
-#	file=os.path.join(args.result_dir, 'picks.csv')
-#	with open(file, 'w') as f:
-#		f.write(','.join(('fname', 'itp', 'prob_p', 'its', 'prob_s', 'true_p',
-#						'true_s'))+'\n')
-#	for i,sample in enumerate(test_loader):
-#		input = Variable(sample['input'].type(dtype)).to(device) # channel first
-#		output = model(input)
-#		input = input.cpu().detach().numpy()
-#		output = output.cpu().detach().numpy()
-#		extract_picks(output,
-#				file=file,
-#				mph_p=.3, mph_s=.3,
-#				label=[sample['p'], sample['s']],
-#				fnames=sample['fname'])
+	# log the pick
+	with open(os.path.join(args.result_dir, 'picks.csv'), 'a') as f:
+		f.write(os.path.join(os.path.abspath(os.path.join(args.fname,
+			os.pardir)), os.path.basename(args.fname))+',')
+		f.write(','.join([','.join([str(pick.peak_time), pick.phase]) for pick in picks])+'\n')
+	# plot the waveform and response
+	plot(sac, model.annotate(sac), folder=os.path.join(args.result_dir,
+		'figures'))

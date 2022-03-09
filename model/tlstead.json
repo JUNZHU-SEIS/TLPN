@@ -6,7 +6,7 @@
     },
     "seisbench_requirement": "0.1.6",
     "default_args": {
-        "P_threshold": 0.24371359808145301,
-        "S_threshold": 0.12588967477204907
+        "P_threshold": 0.41,
+        "S_threshold": 0.36
     }
 }
