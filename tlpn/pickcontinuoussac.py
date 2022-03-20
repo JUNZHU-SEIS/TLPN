@@ -9,6 +9,9 @@ import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 import torch
+# device
+os.environ["CUDA_VISIBLE_DEVICES"] = '0'
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 from obspy import read
 import seisbench.models as sbm
 from config import *
@@ -76,7 +79,7 @@ if __name__ == "__main__":
 	# instantiate a seisbench model
 	model = sbm.PhaseNet(phases='PSN')
 	# choose a model to load
-	model.load_state_dict(torch.load(args.model).state_dict())
+	model.load_state_dict(torch.load(args.model, map_location=device).state_dict())
 	if not os.path.exists(os.path.join(args.result_dir, 'figures')):
 		os.makedirs(os.path.join(args.result_dir, 'figures'))
 	# pick P & S
