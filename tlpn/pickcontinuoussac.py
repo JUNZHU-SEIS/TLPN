@@ -43,6 +43,7 @@ def plot(stream, response, folder='./'):
 	stream.normalize()
 	maxstart, minend = max([x.stats.starttime for x in stream]), min([x.stats.endtime for x in stream])
 	stream.trim(maxstart, minend)
+	print(stream, response)
 	st = np.vstack([tr.data for tr in stream]).transpose()
 	re= np.vstack([tr.data for tr in response])[:-1].transpose()
 	meta = stream[0].stats
@@ -65,7 +66,6 @@ def plot(stream, response, folder='./'):
 #	ax[0].set_yticks([])
 	plt.savefig(os.path.join(folder, title+".png"), dpi=600)
 #	plt.show()
-	plt.close()
 	return
 
 if __name__ == "__main__":
