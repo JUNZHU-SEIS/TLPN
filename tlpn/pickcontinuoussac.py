@@ -46,7 +46,7 @@ def plot(stream, response, folder='./'):
 	stream.normalize()
 	maxstart, minend = max([x.stats.starttime for x in stream]), min([x.stats.endtime for x in stream])
 	stream.trim(maxstart, minend)
-	print(stream, response)
+	print("-----\nINPUT:\n", stream, "\nOUTPUT:\n", response, "\n-----")
 	st = np.vstack([tr.data for tr in stream]).transpose()
 	re= np.vstack([tr.data for tr in response])[:-1].transpose()
 	meta = stream[0].stats
